@@ -1,6 +1,7 @@
 const express = require("express");
 const mysql = require("mysql2");
 const bodyParser = require("body-parser");
+require("dotenv").config();
 
 const app = express();
 
@@ -8,12 +9,13 @@ const app = express();
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(__dirname));
 
-// MySQL connection
+// MySQL connection (Railway compatible)
 const db = mysql.createConnection({
-  host: "localhost",
-  user: "root",
-  password: "vandurgesh18",
-  database: "formdata"
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
+  port: process.env.DB_PORT
 });
 
 db.connect((err) => {
@@ -24,12 +26,12 @@ db.connect((err) => {
   }
 });
 
-// ✅ Form submit route
+// Form submit route
 app.post("/submit", (req, res) => {
   const { full_name, email, mobile, area_city } = req.body;
 
   const sql = `
-    INSERT INTO consultations 
+    INSERT INTO consultations
     (full_name, email, mobile, area_city)
     VALUES (?, ?, ?, ?)
   `;
@@ -37,14 +39,15 @@ app.post("/submit", (req, res) => {
   db.query(sql, [full_name, email, mobile, area_city], (err) => {
     if (err) {
       console.log("Insert Error ❌", err);
-      res.send("Something went wrong");
+      res.status(500).send("Something went wrong");
     } else {
       res.send("Form Submitted Successfully ✅");
     }
   });
 });
 
-// Server start
-app.listen(3000, () => {
-  console.log("Server running at http://localhost:3000");
+// ✅ Railway PORT fix
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log("Server running on port", PORT);
 });
