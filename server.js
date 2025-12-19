@@ -3,26 +3,25 @@ const mysql = require("mysql2");
 
 const app = express();
 
-// middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static("public"));
 
-// Railway PORT fix ✅
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
-// MySQL (Railway ENV use karna hai)
 const db = mysql.createConnection({
-  host: process.env.MYSQLHOST,
-  user: process.env.MYSQLUSER,
-  password: process.env.MYSQLPASSWORD,
-  database: process.env.MYSQLDATABASE,
-  port: process.env.MYSQLPORT
+  host: process.env.MYSQL_HOST,
+  user: process.env.MYSQL_USER,
+  password: process.env.MYSQL_PASSWORD,
+  database: process.env.MYSQL_DATABASE,
+  port: process.env.MYSQL_PORT
 });
 
-
-db.connect(err => {
-  if (err) console.log(err);
-  else console.log("MySQL Connected ✅");
+db.connect((err) => {
+  if (err) {
+    console.error("MySQL Error ❌", err);
+  } else {
+    console.log("MySQL Connected ✅");
+  }
 });
 
 app.post("/submit", (req, res) => {
@@ -31,7 +30,7 @@ app.post("/submit", (req, res) => {
   const sql =
     "INSERT INTO consultations (full_name,email,mobile,area_city) VALUES (?,?,?,?)";
 
-  db.query(sql, [full_name, email, mobile, area_city], err => {
+  db.query(sql, [full_name, email, mobile, area_city], (err) => {
     if (err) return res.send("Error");
     res.send("Form submitted successfully ✅");
   });
