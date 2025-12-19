@@ -4,6 +4,7 @@ const mysql = require("mysql2");
 const app = express();
 
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 app.use(express.static("public"));
 
 const PORT = process.env.PORT || 8080;
@@ -25,7 +26,7 @@ db.connect((err) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
+  res.status(200).send("Backend is running 🚀");
 });
 
 app.post("/submit", (req, res) => {
@@ -35,11 +36,11 @@ app.post("/submit", (req, res) => {
     "INSERT INTO consultations (full_name,email,mobile,area_city) VALUES (?,?,?,?)";
 
   db.query(sql, [full_name, email, mobile, area_city], (err) => {
-    if (err) return res.send("Error");
+    if (err) return res.status(500).send("DB Error");
     res.send("Form submitted successfully ✅");
   });
 });
 
-app.listen(PORT, () => {
+app.listen(PORT, "0.0.0.0", () => {
   console.log("Server running on port", PORT);
 });
