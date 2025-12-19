@@ -25,6 +25,11 @@ db.connect((err) => {
   }
 });
 
+// 🔴 THIS WAS MISSING
+app.get("/", (req, res) => {
+  res.status(200).send("Server is running 🚀");
+});
+
 app.post("/submit", (req, res) => {
   const { full_name, email, mobile, area_city } = req.body;
 
